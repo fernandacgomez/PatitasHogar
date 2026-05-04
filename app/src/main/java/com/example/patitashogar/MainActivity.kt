@@ -391,7 +391,20 @@ fun PantallaReportarMascota(
 
         Button(
             onClick = {
-                mensaje = "Reporte enviado correctamente. La casa hogar revisará la información."
+
+                val nuevaMascota = Mascota(
+                    id = DatosPrueba.mascotas.size + 1,
+                    nombre = "Mascota encontrada",
+                    especie = especie,
+                    raza = "Desconocida",
+                    edad = "No especificado",
+                    descripcion = descripcion,
+                    estado = "Reportada"
+                )
+
+                DatosPrueba.mascotas.add(nuevaMascota)
+
+                mensaje = "Reporte enviado correctamente. La mascota fue agregada a la lista."
             },
             modifier = Modifier.fillMaxWidth()
         ) {

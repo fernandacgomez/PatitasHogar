@@ -4,7 +4,7 @@ import com.example.patitashogar.model.Mascota
 
 object DatosPrueba {
 
-    val mascotas = listOf(
+    val mascotas = mutableListOf(
         Mascota(
             id = 1,
             nombre = "Luna",
