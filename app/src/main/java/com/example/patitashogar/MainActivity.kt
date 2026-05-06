@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppPatitasHogar() {
 
-    var pantallaActual by remember { mutableStateOf("login") }
+    var pantallaActual by remember { mutableStateOf("donacion") }
 
     var mascotaSeleccionada by remember { mutableStateOf<Mascota?>(null) }
 
