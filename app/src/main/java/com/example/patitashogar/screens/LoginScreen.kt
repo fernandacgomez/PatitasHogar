@@ -1,31 +1,13 @@
 package com.example.patitashogar.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -35,13 +17,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.patitashogar.data.DatosPrueba
 @Composable
 fun LoginScreen(
-    onLoginClick: () -> Unit
+    onUserLogin: (String) -> Unit,
+    onAdminLogin: () -> Unit,
+    onIrRegistro: () -> Unit
 ) {
+
     var correo by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf("") }
 
     val verdePrincipal = Color(0xFF0DB14B)
     val verdeOscuro = Color(0xFF087A35)
@@ -62,6 +48,7 @@ fun LoginScreen(
             .padding(horizontal = 24.dp, vertical = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Spacer(modifier = Modifier.height(28.dp))
 
         Surface(
@@ -137,10 +124,43 @@ fun LoginScreen(
                 .height(68.dp)
         )
 
-        Spacer(modifier = Modifier.height(26.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (error.isNotEmpty()) {
+            Text(
+                text = error,
+                color = Color.Red
+            )
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
 
         Button(
-            onClick = onLoginClick,
+            onClick = {
+
+                if (correo == "admin@patitas.com" && contrasena == "1234") {
+
+                    onAdminLogin()
+
+                } else {
+
+                    val usuario = DatosPrueba.usuarios.find {
+                        it.correo == correo && it.password == contrasena
+                    }
+
+                    if (usuario != null) {
+
+                        onUserLogin(usuario.nombre)
+
+                    } else {
+
+                        error = "Usuario o contraseña incorrectos"
+
+                    }
+
+                }
+
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = verdePrincipal
             ),
@@ -158,7 +178,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        TextButton(onClick = { }) {
+        TextButton(onClick = { onIrRegistro() }) {
             Text(
                 text = "¿No tienes cuenta? Regístrate",
                 color = verdeOscuro,

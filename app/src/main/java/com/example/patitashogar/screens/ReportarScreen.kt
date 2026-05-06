@@ -23,14 +23,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.patitashogar.data.DatosPrueba
+import com.example.patitashogar.model.Mascota
 
 @Composable
 fun ReportarScreen(
     onVolver: () -> Unit
 ) {
+
     var nombre by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var especie by remember { mutableStateOf("") }
+    var raza by remember { mutableStateOf("") }
     var lugar by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf("") }
@@ -44,6 +48,7 @@ fun ReportarScreen(
             .verticalScroll(rememberScrollState())
             .padding(22.dp)
     ) {
+
         Text(
             text = "Reportar mascota",
             fontWeight = FontWeight.Bold
@@ -59,6 +64,8 @@ fun ReportarScreen(
             shape = RoundedCornerShape(16.dp)
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+
         OutlinedTextField(
             value = telefono,
             onValueChange = { telefono = it },
@@ -67,13 +74,27 @@ fun ReportarScreen(
             shape = RoundedCornerShape(16.dp)
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+
         OutlinedTextField(
             value = especie,
             onValueChange = { especie = it },
-            label = { Text("Especie") },
+            label = { Text("Especie (Perro, Gato, etc)") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp)
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = raza,
+            onValueChange = { raza = it },
+            label = { Text("Raza del animal") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp)
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
 
         OutlinedTextField(
             value = lugar,
@@ -83,19 +104,43 @@ fun ReportarScreen(
             shape = RoundedCornerShape(16.dp)
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+
         OutlinedTextField(
             value = descripcion,
             onValueChange = { descripcion = it },
-            label = { Text("Descripción") },
+            label = { Text("Descripción de la mascota") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp)
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
+
+                val nuevaMascota = Mascota(
+                    id = DatosPrueba.mascotas.size + 1,
+                    nombre = "Mascota encontrada",
+                    especie = especie,
+                    raza = raza,
+                    edad = "Desconocida",
+                    descripcion = "$descripcion (Encontrada en: $lugar)",
+                    estado = "Reportada",
+                    nombreContacto = nombre,
+                    telefonoContacto = telefono
+                )
+
+                DatosPrueba.mascotas.add(nuevaMascota)
+
                 mensaje = "Reporte enviado correctamente."
+
+                nombre = ""
+                telefono = ""
+                especie = ""
+                raza = ""
+                lugar = ""
+                descripcion = ""
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = verdePrincipal
@@ -107,7 +152,9 @@ fun ReportarScreen(
         }
 
         if (mensaje.isNotEmpty()) {
+
             Spacer(modifier = Modifier.height(10.dp))
+
             Text(
                 text = mensaje,
                 color = verdePrincipal,

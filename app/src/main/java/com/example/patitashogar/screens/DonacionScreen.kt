@@ -1,36 +1,26 @@
 package com.example.patitashogar.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.patitashogar.data.DatosPrueba
+import com.example.patitashogar.model.Donacion
 
 @Composable
 fun DonacionScreen(
     onVolver: () -> Unit
 ) {
-    var nombre by remember { mutableStateOf("") }
-    var tipoDonacion by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
+
+    var usuario by remember { mutableStateOf("") }
+    var tipo by remember { mutableStateOf("") }
+    var cantidad by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf("") }
 
     val verdePrincipal = Color(0xFF0DB14B)
@@ -40,77 +30,92 @@ fun DonacionScreen(
             .fillMaxSize()
             .background(Color(0xFFF5F6F7))
             .verticalScroll(rememberScrollState())
-            .padding(22.dp)
+            .padding(20.dp)
     ) {
-        Text(
-            text = "Donaciones",
-            fontWeight = FontWeight.Bold
-        )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Text("Realizar Donación")
 
-        Text(
-            text = "Podés donar comida, vacunas, mantas, juguetes, dinero u otros insumos."
-        )
-
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         OutlinedTextField(
-            value = nombre,
-            onValueChange = { nombre = it },
+            value = usuario,
+            onValueChange = { usuario = it },
             label = { Text("Nombre del donante") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp)
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+
         OutlinedTextField(
-            value = tipoDonacion,
-            onValueChange = { tipoDonacion = it },
-            label = { Text("Tipo de donación") },
+            value = tipo,
+            onValueChange = { tipo = it },
+            label = { Text("Tipo de donación (Dinero, Comida, Medicinas)") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp)
         )
 
+        Spacer(modifier = Modifier.height(10.dp))
+
         OutlinedTextField(
-            value = descripcion,
-            onValueChange = { descripcion = it },
-            label = { Text("Descripción") },
+            value = cantidad,
+            onValueChange = { cantidad = it },
+            label = { Text("Cantidad o monto") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp)
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Button(
             onClick = {
-                mensaje = "Donación registrada correctamente. Gracias por apoyar."
+
+                val nuevaDonacion = Donacion(
+                    usuario = usuario,
+                    tipo = tipo,
+                    cantidad = cantidad
+                )
+
+                DatosPrueba.listaDonaciones.add(nuevaDonacion)
+
+                println(DatosPrueba.listaDonaciones)
+
+                mensaje = "Donación registrada correctamente"
+
+                usuario = ""
+                tipo = ""
+                cantidad = ""
+
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = verdePrincipal
             ),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Registrar donación")
+            Text("Enviar donación")
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
 
         if (mensaje.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(10.dp))
+
             Text(
                 text = mensaje,
-                color = verdePrincipal,
-                fontWeight = FontWeight.Bold
+                color = verdePrincipal
             )
+
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Button(
             onClick = onVolver,
-            shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Volver")
         }
+
     }
+
 }

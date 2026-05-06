@@ -36,6 +36,7 @@ import com.example.patitashogar.model.Mascota
 
 @Composable
 fun HomeScreen(
+    nombreUsuario: String,
     onVerDetalle: (Mascota) -> Unit,
     onIrReportar: () -> Unit,
     onIrDonar: () -> Unit,
@@ -78,7 +79,7 @@ fun HomeScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Hola, Usuario",
+                            text = "Hola, $nombreUsuario",
                             color = Color.White.copy(alpha = 0.9f)
                         )
                     }

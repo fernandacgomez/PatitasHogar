@@ -117,8 +117,8 @@ fun DetalleMascotaScreen(
                                     text = "Contacto de adopción",
                                     fontWeight = FontWeight.Bold
                                 )
-                                Text("WhatsApp: 8888-0000")
-                                Text("Correo: patitashogar@gmail.com")
+                                Text("Nombre: ${mascota.nombreContacto}")
+                                Text("Teléfono: ${mascota.telefonoContacto}")
                             }
                         }
                     }
