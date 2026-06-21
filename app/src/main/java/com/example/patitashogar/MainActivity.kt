@@ -10,7 +10,9 @@ import com.example.patitashogar.screens.AdminDonacionesScreen
 import com.example.patitashogar.screens.AdminScreen
 import com.example.patitashogar.screens.DetalleMascotaScreen
 import com.example.patitashogar.screens.DonacionScreen
+import com.example.patitashogar.screens.DonacionTipoScreen
 import com.example.patitashogar.screens.HomeScreen
+import com.example.patitashogar.screens.InsumosScreen
 import com.example.patitashogar.screens.LoginScreen
 import com.example.patitashogar.screens.RegisterScreen
 import com.example.patitashogar.screens.ReportarScreen
@@ -34,7 +36,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppPatitasHogar() {
 
-    var pantallaActual by remember { mutableStateOf("donacion") }
+    var pantallaActual by remember { mutableStateOf("login") }
 
     var mascotaSeleccionada by remember { mutableStateOf<Mascota?>(null) }
 
@@ -58,7 +60,6 @@ fun AppPatitasHogar() {
                 onIrRegistro = {
                     pantallaActual = "registro"
                 }
-
             )
         }
 
@@ -69,9 +70,7 @@ fun AppPatitasHogar() {
                 onRegisterSuccess = {
                     pantallaActual = "login"
                 }
-
             )
-
         }
 
         "home" -> {
@@ -81,10 +80,8 @@ fun AppPatitasHogar() {
                 nombreUsuario = usuarioActual,
 
                 onVerDetalle = { mascota ->
-
                     mascotaSeleccionada = mascota
                     pantallaActual = "detalle"
-
                 },
 
                 onIrReportar = {
@@ -92,13 +89,12 @@ fun AppPatitasHogar() {
                 },
 
                 onIrDonar = {
-                    pantallaActual = "donacion"
+                    pantallaActual = "tipoDonacion"
                 },
 
                 onCerrarSesion = {
                     pantallaActual = "login"
                 }
-
             )
         }
 
@@ -111,7 +107,6 @@ fun AppPatitasHogar() {
                 onVolver = {
                     pantallaActual = "home"
                 }
-
             )
         }
 
@@ -122,7 +117,20 @@ fun AppPatitasHogar() {
                 onVolver = {
                     pantallaActual = "home"
                 }
+            )
+        }
 
+        "tipoDonacion" -> {
+
+            DonacionTipoScreen(
+
+                onEfectivoClick = {
+                    pantallaActual = "donacion"
+                },
+
+                onInsumoClick = {
+                    pantallaActual = "insumos"
+                }
             )
         }
 
@@ -133,7 +141,16 @@ fun AppPatitasHogar() {
                 onVolver = {
                     pantallaActual = "home"
                 }
+            )
+        }
 
+        "insumos" -> {
+
+            InsumosScreen(
+
+                onVolver = {
+                    pantallaActual = "home"
+                }
             )
         }
 
@@ -148,7 +165,6 @@ fun AppPatitasHogar() {
                 onCerrarSesion = {
                     pantallaActual = "login"
                 }
-
             )
         }
 
@@ -159,9 +175,7 @@ fun AppPatitasHogar() {
                 onVolver = {
                     pantallaActual = "admin"
                 }
-
             )
         }
-
     }
 }
