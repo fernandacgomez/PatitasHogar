@@ -5,7 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import com.example.patitashogar.database.PatitasDatabase
 import com.example.patitashogar.model.Mascota
+import com.example.patitashogar.repository.DonacionRepository
 import com.example.patitashogar.screens.AdminDonacionesScreen
 import com.example.patitashogar.screens.AdminScreen
 import com.example.patitashogar.screens.DetalleMascotaScreen
@@ -17,6 +20,7 @@ import com.example.patitashogar.screens.LoginScreen
 import com.example.patitashogar.screens.RegisterScreen
 import com.example.patitashogar.screens.ReportarScreen
 import com.example.patitashogar.ui.theme.PatitasHogarTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -41,6 +45,22 @@ fun AppPatitasHogar() {
     var mascotaSeleccionada by remember { mutableStateOf<Mascota?>(null) }
 
     var usuarioActual by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+
+    val database = remember {
+        PatitasDatabase.obtenerDatabase(context)
+    }
+
+    val donacionRepository = remember {
+        DonacionRepository(database.donacionDao())
+    }
+
+    val donaciones by donacionRepository.todasLasDonaciones.collectAsState(
+        initial = emptyList()
+    )
+
+    val scope = rememberCoroutineScope()
 
     when (pantallaActual) {
 
@@ -150,6 +170,13 @@ fun AppPatitasHogar() {
 
                 onVolver = {
                     pantallaActual = "home"
+                },
+
+                onGuardarDonacion = { donacion ->
+                    scope.launch {
+                        donacionRepository.insertarDonacion(donacion)
+                        pantallaActual = "home"
+                    }
                 }
             )
         }
@@ -171,6 +198,8 @@ fun AppPatitasHogar() {
         "adminDonaciones" -> {
 
             AdminDonacionesScreen(
+
+                donaciones = donaciones,
 
                 onVolver = {
                     pantallaActual = "admin"
