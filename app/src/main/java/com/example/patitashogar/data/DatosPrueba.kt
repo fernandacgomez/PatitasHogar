@@ -1,36 +1,43 @@
 package com.example.patitashogar.data
 
 import com.example.patitashogar.model.Mascota
-
+import com.example.patitashogar.model.Donacion
+import com.example.patitashogar.model.Usuario
 object DatosPrueba {
 
-    val mascotas = listOf(
+    // LISTA DE MASCOTAS
+    val mascotas = mutableListOf(
+
         Mascota(
             id = 1,
-            nombre = "Luna",
+            nombre = "Max",
             especie = "Perro",
-            raza = "Mestiza",
+            raza = "Labrador",
             edad = "2 años",
-            descripcion = "Es una perrita tranquila, cariñosa y muy sociable.",
-            estado = "Disponible para adopción"
+            descripcion = "Perro juguetón",
+            estado = "Disponible",
+            nombreContacto = "Refugio",
+            telefonoContacto = "0000"
         ),
+
         Mascota(
             id = 2,
-            nombre = "Milo",
+            nombre = "Luna",
             especie = "Gato",
             raza = "Criollo",
             edad = "1 año",
-            descripcion = "Es un gatito curioso, juguetón y cariñoso.",
-            estado = "Disponible para adopción"
-        ),
-        Mascota(
-            id = 3,
-            nombre = "Canela",
-            especie = "Perro",
-            raza = "Labrador mestiza",
-            edad = "3 años",
-            descripcion = "Es una perrita obediente, noble y protectora.",
-            estado = "Disponible para adopción"
+            descripcion = "Muy cariñosa",
+            estado = "Disponible",
+            nombreContacto = "Refugio",
+            telefonoContacto = "0000"
         )
+
     )
+
+
+    // LISTA DE DONACIONES
+    val listaDonaciones = mutableListOf<Donacion>()
+
+    val usuarios = mutableListOf<Usuario>()
+
 }
