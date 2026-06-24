@@ -1,35 +1,26 @@
 package com.example.patitashogar.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.patitashogar.model.Mascota
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.example.patitashogar.database.MascotaEntity
 
 @Composable
 fun DetalleMascotaScreen(
-    mascota: Mascota?,
+    mascota: MascotaEntity?,
     onVolver: () -> Unit
 ) {
     var mostrarContacto by remember { mutableStateOf(false) }
@@ -39,6 +30,7 @@ fun DetalleMascotaScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F6F7))
+            .verticalScroll(rememberScrollState())
             .padding(22.dp)
     ) {
         Text(
@@ -51,9 +43,7 @@ fun DetalleMascotaScreen(
         if (mascota != null) {
             Card(
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(4.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -61,18 +51,35 @@ fun DetalleMascotaScreen(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = if (mascota.especie.lowercase() == "perro") "🐶" else "🐱"
+                    // Foto real si existe, emoji si no
+                    if (mascota.fotoUri.isNotBlank()) {
+                        AsyncImage(
+                            model = mascota.fotoUri,
+                            contentDescription = "Foto de ${mascota.nombre}",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp)
+                                .clip(RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.Crop
                         )
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if (mascota.especie.lowercase() == "perro") "🐶" else "🐱",
+                                fontSize = 80.sp
+                            )
+                        }
                     }
+
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
                         text = mascota.nombre,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
                     )
 
                     Text("Especie: ${mascota.especie}")
@@ -86,8 +93,16 @@ fun DetalleMascotaScreen(
                         text = "Descripción:",
                         fontWeight = FontWeight.Bold
                     )
-
                     Text(text = mascota.descripcion)
+
+                    if (mascota.fechaRegistro.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Registrada: ${mascota.fechaRegistro}",
+                            color = Color.Gray,
+                            fontSize = 13.sp
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -110,9 +125,7 @@ fun DetalleMascotaScreen(
                             ),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp)
-                            ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
                                 Text(
                                     text = "Contacto de adopción",
                                     fontWeight = FontWeight.Bold

@@ -1,43 +1,28 @@
 package com.example.patitashogar.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.patitashogar.data.DatosPrueba
-import com.example.patitashogar.model.Mascota
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.example.patitashogar.database.MascotaEntity
 
 @Composable
 fun HomeScreen(
     nombreUsuario: String,
-    onVerDetalle: (Mascota) -> Unit,
+    mascotas: List<MascotaEntity>,               // ← ahora viene de Room
+    onVerDetalle: (MascotaEntity) -> Unit,
     onIrReportar: () -> Unit,
     onIrDonar: () -> Unit,
     onCerrarSesion: () -> Unit
@@ -55,17 +40,13 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Surface(
                         shape = RoundedCornerShape(16.dp),
                         color = Color.White,
                         modifier = Modifier.size(54.dp)
                     ) {
-                        Box(
-                            contentAlignment = Alignment.Center
-                        ) {
+                        Box(contentAlignment = Alignment.Center) {
                             Text(text = "💚", fontWeight = FontWeight.Bold)
                         }
                     }
@@ -98,14 +79,12 @@ fun HomeScreen(
                     icon = { Text("💚") },
                     label = { Text("Adopción") }
                 )
-
                 NavigationBarItem(
                     selected = false,
                     onClick = onIrReportar,
                     icon = { Text("🐾") },
                     label = { Text("Reportar") }
                 )
-
                 NavigationBarItem(
                     selected = false,
                     onClick = onIrDonar,
@@ -115,7 +94,6 @@ fun HomeScreen(
             }
         }
     ) { padding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -137,14 +115,28 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                items(DatosPrueba.mascotas) { mascota ->
-                    MascotaCard(
-                        mascota = mascota,
-                        onVerDetalle = { onVerDetalle(mascota) }
-                    )
+            if (mascotas.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = "🐾", fontSize = 50.sp)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "Aún no hay mascotas reportadas.",
+                            color = Color.Gray
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    items(mascotas) { mascota ->
+                        MascotaCard(
+                            mascota = mascota,
+                            onVerDetalle = { onVerDetalle(mascota) }
+                        )
+                    }
                 }
             }
         }
@@ -153,53 +145,53 @@ fun HomeScreen(
 
 @Composable
 fun MascotaCard(
-    mascota: Mascota,
+    mascota: MascotaEntity,
     onVerDetalle: () -> Unit
 ) {
     val verdePrincipal = Color(0xFF0DB14B)
 
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Surface(
-                    modifier = Modifier.size(90.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    color = Color(0xFFEAF8EF)
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                // Foto real o emoji
+                if (mascota.fotoUri.isNotBlank()) {
+                    AsyncImage(
+                        model = mascota.fotoUri,
+                        contentDescription = "Foto de ${mascota.nombre}",
+                        modifier = Modifier
+                            .size(90.dp)
+                            .clip(RoundedCornerShape(20.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Surface(
+                        modifier = Modifier.size(90.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        color = Color(0xFFEAF8EF)
                     ) {
-                        Text(
-                            text = if (mascota.especie.lowercase() == "perro") "🐶" else "🐱"
-                        )
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = if (mascota.especie.lowercase() == "perro") "🐶" else "🐱",
+                                fontSize = 40.sp
+                            )
+                        }
                     }
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = mascota.nombre,
                         fontWeight = FontWeight.Bold
                     )
-
                     Spacer(modifier = Modifier.height(4.dp))
-
                     Text("${mascota.especie} • ${mascota.raza}")
                     Text("${mascota.edad} • ${mascota.estado}")
                 }
@@ -211,9 +203,7 @@ fun MascotaCard(
 
             Button(
                 onClick = onVerDetalle,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = verdePrincipal
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = verdePrincipal),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
