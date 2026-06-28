@@ -4,10 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.example.patitashogar.database.PatitasDatabase
 import com.example.patitashogar.model.Mascota
+import com.example.patitashogar.repository.DonacionApiRepository
 import com.example.patitashogar.repository.DonacionRepository
 import com.example.patitashogar.screens.AdminDonacionesScreen
 import com.example.patitashogar.screens.AdminScreen
@@ -41,13 +48,13 @@ class MainActivity : ComponentActivity() {
 fun AppPatitasHogar() {
 
     var pantallaActual by remember { mutableStateOf("login") }
-
     var mascotaSeleccionada by remember { mutableStateOf<Mascota?>(null) }
-
     var usuarioActual by remember { mutableStateOf("") }
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
+    // Room todavía se usa para mostrar donaciones en AdminDonacionesScreen por ahora
     val database = remember {
         PatitasDatabase.obtenerDatabase(context)
     }
@@ -60,23 +67,22 @@ fun AppPatitasHogar() {
         initial = emptyList()
     )
 
-    val scope = rememberCoroutineScope()
+    // Repository de la API REST
+    val donacionApiRepository = remember {
+        DonacionApiRepository()
+    }
 
     when (pantallaActual) {
 
         "login" -> {
-
             LoginScreen(
-
                 onUserLogin = { nombre ->
                     usuarioActual = nombre
                     pantallaActual = "home"
                 },
-
                 onAdminLogin = {
                     pantallaActual = "admin"
                 },
-
                 onIrRegistro = {
                     pantallaActual = "registro"
                 }
@@ -84,9 +90,7 @@ fun AppPatitasHogar() {
         }
 
         "registro" -> {
-
             RegisterScreen(
-
                 onRegisterSuccess = {
                     pantallaActual = "login"
                 }
@@ -94,24 +98,18 @@ fun AppPatitasHogar() {
         }
 
         "home" -> {
-
             HomeScreen(
-
                 nombreUsuario = usuarioActual,
-
                 onVerDetalle = { mascota ->
                     mascotaSeleccionada = mascota
                     pantallaActual = "detalle"
                 },
-
                 onIrReportar = {
                     pantallaActual = "reportar"
                 },
-
                 onIrDonar = {
                     pantallaActual = "tipoDonacion"
                 },
-
                 onCerrarSesion = {
                     pantallaActual = "login"
                 }
@@ -119,11 +117,8 @@ fun AppPatitasHogar() {
         }
 
         "detalle" -> {
-
             DetalleMascotaScreen(
-
                 mascota = mascotaSeleccionada,
-
                 onVolver = {
                     pantallaActual = "home"
                 }
@@ -131,9 +126,7 @@ fun AppPatitasHogar() {
         }
 
         "reportar" -> {
-
             ReportarScreen(
-
                 onVolver = {
                     pantallaActual = "home"
                 }
@@ -141,13 +134,10 @@ fun AppPatitasHogar() {
         }
 
         "tipoDonacion" -> {
-
             DonacionTipoScreen(
-
                 onEfectivoClick = {
                     pantallaActual = "donacion"
                 },
-
                 onInsumoClick = {
                     pantallaActual = "insumos"
                 }
@@ -155,9 +145,7 @@ fun AppPatitasHogar() {
         }
 
         "donacion" -> {
-
             DonacionScreen(
-
                 onVolver = {
                     pantallaActual = "home"
                 }
@@ -165,30 +153,28 @@ fun AppPatitasHogar() {
         }
 
         "insumos" -> {
-
             InsumosScreen(
-
                 onVolver = {
                     pantallaActual = "home"
                 },
-
                 onGuardarDonacion = { donacion ->
                     scope.launch {
-                        donacionRepository.insertarDonacion(donacion)
-                        pantallaActual = "home"
+                        try {
+                            donacionApiRepository.guardarDonacion(donacion)
+                            pantallaActual = "home"
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
             )
         }
 
         "admin" -> {
-
             AdminScreen(
-
                 onVerDonaciones = {
                     pantallaActual = "adminDonaciones"
                 },
-
                 onCerrarSesion = {
                     pantallaActual = "login"
                 }
@@ -196,11 +182,8 @@ fun AppPatitasHogar() {
         }
 
         "adminDonaciones" -> {
-
             AdminDonacionesScreen(
-
                 donaciones = donaciones,
-
                 onVolver = {
                     pantallaActual = "admin"
                 }

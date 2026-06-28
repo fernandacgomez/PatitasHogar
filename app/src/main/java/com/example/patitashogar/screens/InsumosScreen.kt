@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.patitashogar.database.DonacionEntity
+import com.example.patitashogar.service.DonacionApi
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -41,7 +41,7 @@ data class OpcionInsumo(
 @Composable
 fun InsumosScreen(
     onVolver: () -> Unit,
-    onGuardarDonacion: (DonacionEntity) -> Unit
+    onGuardarDonacion: (DonacionApi) -> Unit
 ) {
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFFEAF3E6)
@@ -340,7 +340,7 @@ fun InsumosScreen(
 
         Button(
             onClick = {
-                val donacion = DonacionEntity(
+                val donacion = DonacionApi(
                     tipoDonacion = "Insumo",
                     nombreDonante = "",
                     monto = "",
