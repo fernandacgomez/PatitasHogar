@@ -12,6 +12,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.example.patitashogar.model.Mascota
 import com.example.patitashogar.repository.DonacionApiRepository
+import com.example.patitashogar.repository.MascotaApiRepository
+import com.example.patitashogar.repository.UsuarioApiRepository
 import com.example.patitashogar.screens.AdminDonacionesScreen
 import com.example.patitashogar.screens.AdminScreen
 import com.example.patitashogar.screens.DetalleMascotaScreen
@@ -58,6 +60,14 @@ fun AppPatitasHogar() {
         DonacionApiRepository()
     }
 
+    val mascotaApiRepository = remember {
+        MascotaApiRepository()
+    }
+
+    val usuarioApiRepository = remember {
+        UsuarioApiRepository()
+    }
+
     when (pantallaActual) {
 
         "login" -> {
@@ -79,6 +89,15 @@ fun AppPatitasHogar() {
             RegisterScreen(
                 onRegisterSuccess = {
                     pantallaActual = "login"
+                },
+                onRegistrarUsuario = { usuario ->
+                    scope.launch {
+                        try {
+                            usuarioApiRepository.registrarUsuario(usuario)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
             )
         }
@@ -115,6 +134,16 @@ fun AppPatitasHogar() {
             ReportarScreen(
                 onVolver = {
                     pantallaActual = "home"
+                },
+                onGuardarMascota = { mascota ->
+                    scope.launch {
+                        try {
+                            mascotaApiRepository.guardarMascota(mascota)
+                            pantallaActual = "home"
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
             )
         }
@@ -134,6 +163,16 @@ fun AppPatitasHogar() {
             DonacionScreen(
                 onVolver = {
                     pantallaActual = "home"
+                },
+                onGuardarDonacion = { donacion ->
+                    scope.launch {
+                        try {
+                            donacionApiRepository.guardarDonacion(donacion)
+                            pantallaActual = "home"
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
             )
         }

@@ -15,15 +15,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-// Importaciones de tu amigo para que guarde la donación
-import com.example.patitashogar.data.DatosPrueba
-import com.example.patitashogar.model.Donacion
+import com.example.patitashogar.service.DonacionApi
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
-fun DonacionScreen(onVolver: () -> Unit) {
-
-    // Estados del formulario
+fun DonacionScreen(
+    onVolver: () -> Unit,
+    onGuardarDonacion: (DonacionApi) -> Unit
+) {
     var otraCantidad by remember { mutableStateOf("") }
     var numeroTarjeta by remember { mutableStateOf("") }
     var fecha by remember { mutableStateOf("") }
@@ -31,7 +32,6 @@ fun DonacionScreen(onVolver: () -> Unit) {
     var nombreTarjeta by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf("") }
 
-    // Colores del diseño
     val verdePrincipal = Color(0xFF0DB14B)
     val verdeClaroFondo = Color(0xFFF0FDF4)
     val colorFondoPantalla = Color(0xFFF8F9FA)
@@ -42,8 +42,6 @@ fun DonacionScreen(onVolver: () -> Unit) {
             .background(colorFondoPantalla)
             .verticalScroll(rememberScrollState())
     ) {
-
-        // 🔝 HEADER
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,7 +49,6 @@ fun DonacionScreen(onVolver: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Corazón verde
             Box(
                 modifier = Modifier
                     .size(45.dp)
@@ -64,11 +61,20 @@ fun DonacionScreen(onVolver: () -> Unit) {
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("PatitasFelices", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text("Hola, Usuario", color = Color.White, fontSize = 14.sp)
+                Text(
+                    text = "PatitasFelices",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+
+                Text(
+                    text = "Hola, Usuario",
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
             }
 
-            // Ícono de usuario
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -80,8 +86,6 @@ fun DonacionScreen(onVolver: () -> Unit) {
         }
 
         Column(modifier = Modifier.padding(16.dp)) {
-
-            // 💰 CAMPO MONTO
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -94,7 +98,13 @@ fun DonacionScreen(onVolver: () -> Unit) {
                         onValueChange = { otraCantidad = it },
                         placeholder = { Text("Otra cantidad", color = Color.Gray) },
                         leadingIcon = { Text("$", modifier = Modifier.padding(start = 16.dp)) },
-                        trailingIcon = { Text("MXN", modifier = Modifier.padding(end = 16.dp), color = Color.Gray) },
+                        trailingIcon = {
+                            Text(
+                                text = "C$",
+                                modifier = Modifier.padding(end = 16.dp),
+                                color = Color.Gray
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -107,7 +117,6 @@ fun DonacionScreen(onVolver: () -> Unit) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 💳 DATOS TARJETA
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -115,7 +124,11 @@ fun DonacionScreen(onVolver: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Información de pago", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(
+                        text = "Información de pago",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -123,7 +136,13 @@ fun DonacionScreen(onVolver: () -> Unit) {
                         value = numeroTarjeta,
                         onValueChange = { numeroTarjeta = it },
                         placeholder = { Text("Número de tarjeta") },
-                        leadingIcon = { Text("💳", modifier = Modifier.padding(start = 16.dp), fontSize = 20.sp) },
+                        leadingIcon = {
+                            Text(
+                                text = "💳",
+                                modifier = Modifier.padding(start = 16.dp),
+                                fontSize = 20.sp
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -138,6 +157,7 @@ fun DonacionScreen(onVolver: () -> Unit) {
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         )
+
                         OutlinedTextField(
                             value = cvv,
                             onValueChange = { cvv = it },
@@ -161,14 +181,18 @@ fun DonacionScreen(onVolver: () -> Unit) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 🧠 INFO
             Card(
                 colors = CardDefaults.cardColors(containerColor = verdeClaroFondo),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("¿Cómo ayuda tu donación?", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(
+                        text = "¿Cómo ayuda tu donación?",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
 
                     val beneficios = listOf(
@@ -184,9 +208,20 @@ fun DonacionScreen(onVolver: () -> Unit) {
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(vertical = 4.dp)
                         ) {
-                            Text("✓", color = verdePrincipal, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "✓",
+                                color = verdePrincipal,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(beneficio, fontSize = 13.sp, color = Color(0xFF374151))
+
+                            Text(
+                                text = beneficio,
+                                fontSize = 13.sp,
+                                color = Color(0xFF374151)
+                            )
                         }
                     }
                 }
@@ -194,22 +229,23 @@ fun DonacionScreen(onVolver: () -> Unit) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 🔘 BOTÓN DONAR
             Button(
                 onClick = {
-                    if(otraCantidad.isNotBlank() && nombreTarjeta.isNotBlank()) {
-                        val nuevaDonacion = Donacion(
-                            usuario = nombreTarjeta,
-                            tipo = "Dinero",
-                            cantidad = otraCantidad
+                    if (otraCantidad.isNotBlank() && nombreTarjeta.isNotBlank()) {
+                        val nuevaDonacion = DonacionApi(
+                            tipoDonacion = "Dinero",
+                            nombreDonante = nombreTarjeta,
+                            monto = otraCantidad,
+                            tipoInsumo = "",
+                            ciudad = "",
+                            comentarios = "Donación monetaria registrada desde la app",
+                            fechaRegistro = obtenerFechaActualDonacion()
                         )
 
-                        DatosPrueba.listaDonaciones.add(nuevaDonacion)
-                        println("Donación guardada: " + DatosPrueba.listaDonaciones)
+                        onGuardarDonacion(nuevaDonacion)
 
-                        mensaje = "¡Donación de $$otraCantidad registrada correctamente!"
+                        mensaje = "¡Donación de C$$otraCantidad registrada correctamente!"
 
-                        // Limpiar formulario
                         otraCantidad = ""
                         numeroTarjeta = ""
                         fecha = ""
@@ -225,15 +261,20 @@ fun DonacionScreen(onVolver: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = verdePrincipal),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Enviar donación", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = "Enviar donación",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
-            // Mensaje de éxito o error
             if (mensaje.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(10.dp))
+
                 Text(
                     text = mensaje,
-                    color = if(mensaje.contains("correctamente")) verdePrincipal else Color.Red,
+                    color = if (mensaje.contains("correctamente")) verdePrincipal else Color.Red,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
@@ -250,4 +291,9 @@ fun DonacionScreen(onVolver: () -> Unit) {
             }
         }
     }
+}
+
+fun obtenerFechaActualDonacion(): String {
+    val formato = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    return formato.format(Date())
 }

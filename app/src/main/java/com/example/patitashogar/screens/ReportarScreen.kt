@@ -23,14 +23,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.patitashogar.data.DatosPrueba
-import com.example.patitashogar.model.Mascota
+import com.example.patitashogar.service.MascotaApi
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun ReportarScreen(
-    onVolver: () -> Unit
+    onVolver: () -> Unit,
+    onGuardarMascota: (MascotaApi) -> Unit
 ) {
-
     var nombre by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var especie by remember { mutableStateOf("") }
@@ -48,7 +50,6 @@ fun ReportarScreen(
             .verticalScroll(rememberScrollState())
             .padding(22.dp)
     ) {
-
         Text(
             text = "Reportar mascota",
             fontWeight = FontWeight.Bold
@@ -118,29 +119,40 @@ fun ReportarScreen(
 
         Button(
             onClick = {
+                if (
+                    nombre.isNotBlank() &&
+                    telefono.isNotBlank() &&
+                    especie.isNotBlank() &&
+                    lugar.isNotBlank() &&
+                    descripcion.isNotBlank()
+                ) {
+                    val nuevaMascota = MascotaApi(
+                        nombre = "Mascota encontrada",
+                        tipo = especie,
+                        raza = raza,
+                        edad = "Desconocida",
+                        sexo = "No especificado",
+                        ciudad = "Managua",
+                        ubicacion = lugar,
+                        descripcion = "Descripción: $descripcion. Reportante: $nombre. Teléfono: $telefono.",
+                        estado = "Reportada",
+                        imagenUrl = "",
+                        fechaRegistro = obtenerFechaActualReporte()
+                    )
 
-                val nuevaMascota = Mascota(
-                    id = DatosPrueba.mascotas.size + 1,
-                    nombre = "Mascota encontrada",
-                    especie = especie,
-                    raza = raza,
-                    edad = "Desconocida",
-                    descripcion = "$descripcion (Encontrada en: $lugar)",
-                    estado = "Reportada",
-                    nombreContacto = nombre,
-                    telefonoContacto = telefono
-                )
+                    onGuardarMascota(nuevaMascota)
 
-                DatosPrueba.mascotas.add(nuevaMascota)
+                    mensaje = "Reporte enviado correctamente."
 
-                mensaje = "Reporte enviado correctamente."
-
-                nombre = ""
-                telefono = ""
-                especie = ""
-                raza = ""
-                lugar = ""
-                descripcion = ""
+                    nombre = ""
+                    telefono = ""
+                    especie = ""
+                    raza = ""
+                    lugar = ""
+                    descripcion = ""
+                } else {
+                    mensaje = "Por favor, completa los campos principales."
+                }
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = verdePrincipal
@@ -152,12 +164,11 @@ fun ReportarScreen(
         }
 
         if (mensaje.isNotEmpty()) {
-
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text = mensaje,
-                color = verdePrincipal,
+                color = if (mensaje.contains("correctamente")) verdePrincipal else Color.Red,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -172,4 +183,9 @@ fun ReportarScreen(
             Text("Volver")
         }
     }
+}
+
+fun obtenerFechaActualReporte(): String {
+    val formato = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    return formato.format(Date())
 }

@@ -1,18 +1,30 @@
+
 package com.example.patitashogar.screens
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.patitashogar.data.DatosPrueba
-import com.example.patitashogar.model.Usuario
+import com.example.patitashogar.service.UsuarioApi
 
 @Composable
 fun RegisterScreen(
-    onRegisterSuccess: () -> Unit
+    onRegisterSuccess: () -> Unit,
+    onRegistrarUsuario: (UsuarioApi) -> Unit
 ) {
-
     var nombre by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -23,7 +35,6 @@ fun RegisterScreen(
             .fillMaxSize()
             .padding(20.dp)
     ) {
-
         Text("Crear cuenta")
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -50,6 +61,7 @@ fun RegisterScreen(
             value = password,
             onValueChange = { password = it },
             label = { Text("Contraseña") },
+            visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -57,19 +69,30 @@ fun RegisterScreen(
 
         Button(
             onClick = {
+                if (
+                    nombre.isNotBlank() &&
+                    correo.isNotBlank() &&
+                    password.isNotBlank()
+                ) {
+                    val nuevoUsuario = UsuarioApi(
+                        nombre = nombre,
+                        correo = correo,
+                        password = password,
+                        rol = "USUARIO"
+                    )
 
-                val nuevoUsuario = Usuario(
-                    nombre = nombre,
-                    correo = correo,
-                    password = password
-                )
+                    onRegistrarUsuario(nuevoUsuario)
 
-                DatosPrueba.usuarios.add(nuevoUsuario)
+                    mensaje = "Cuenta creada correctamente"
 
-                mensaje = "Cuenta creada correctamente"
+                    nombre = ""
+                    correo = ""
+                    password = ""
 
-                onRegisterSuccess()
-
+                    onRegisterSuccess()
+                } else {
+                    mensaje = "Por favor, completa todos los campos."
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -79,7 +102,5 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(mensaje)
-
     }
-
 }
