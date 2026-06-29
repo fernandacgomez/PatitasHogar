@@ -5,17 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import com.example.patitashogar.database.PatitasDatabase
 import com.example.patitashogar.model.Mascota
 import com.example.patitashogar.repository.DonacionApiRepository
-import com.example.patitashogar.repository.DonacionRepository
 import com.example.patitashogar.screens.AdminDonacionesScreen
 import com.example.patitashogar.screens.AdminScreen
 import com.example.patitashogar.screens.DetalleMascotaScreen
@@ -26,6 +22,7 @@ import com.example.patitashogar.screens.InsumosScreen
 import com.example.patitashogar.screens.LoginScreen
 import com.example.patitashogar.screens.RegisterScreen
 import com.example.patitashogar.screens.ReportarScreen
+import com.example.patitashogar.service.DonacionApi
 import com.example.patitashogar.ui.theme.PatitasHogarTheme
 import kotlinx.coroutines.launch
 
@@ -51,23 +48,12 @@ fun AppPatitasHogar() {
     var mascotaSeleccionada by remember { mutableStateOf<Mascota?>(null) }
     var usuarioActual by remember { mutableStateOf("") }
 
-    val context = LocalContext.current
+    var donacionesApi by remember {
+        mutableStateOf<List<DonacionApi>>(emptyList())
+    }
+
     val scope = rememberCoroutineScope()
 
-    // Room todavía se usa para mostrar donaciones en AdminDonacionesScreen por ahora
-    val database = remember {
-        PatitasDatabase.obtenerDatabase(context)
-    }
-
-    val donacionRepository = remember {
-        DonacionRepository(database.donacionDao())
-    }
-
-    val donaciones by donacionRepository.todasLasDonaciones.collectAsState(
-        initial = emptyList()
-    )
-
-    // Repository de la API REST
     val donacionApiRepository = remember {
         DonacionApiRepository()
     }
@@ -173,7 +159,14 @@ fun AppPatitasHogar() {
         "admin" -> {
             AdminScreen(
                 onVerDonaciones = {
-                    pantallaActual = "adminDonaciones"
+                    scope.launch {
+                        try {
+                            donacionesApi = donacionApiRepository.obtenerDonaciones()
+                            pantallaActual = "adminDonaciones"
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 },
                 onCerrarSesion = {
                     pantallaActual = "login"
@@ -183,7 +176,7 @@ fun AppPatitasHogar() {
 
         "adminDonaciones" -> {
             AdminDonacionesScreen(
-                donaciones = donaciones,
+                donaciones = donacionesApi,
                 onVolver = {
                     pantallaActual = "admin"
                 }

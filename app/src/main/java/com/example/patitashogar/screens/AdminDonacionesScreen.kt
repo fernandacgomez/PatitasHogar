@@ -20,11 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.patitashogar.database.DonacionEntity
+import com.example.patitashogar.service.DonacionApi
 
 @Composable
 fun AdminDonacionesScreen(
-    donaciones: List<DonacionEntity>,
+    donaciones: List<DonacionApi>,
     onVolver: () -> Unit
 ) {
     val verde = Color(0xFF2E7D32)
@@ -51,7 +51,7 @@ fun AdminDonacionesScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Historial guardado localmente con Room",
+            text = "Historial guardado en PostgreSQL mediante API REST",
             modifier = Modifier.fillMaxWidth(),
             fontSize = 15.sp,
             color = Color.DarkGray,
@@ -175,7 +175,7 @@ fun AdminDonacionesScreen(
 
 @Composable
 fun DonacionCard(
-    donacion: DonacionEntity
+    donacion: DonacionApi
 ) {
     val verde = Color(0xFF2E7D32)
 
