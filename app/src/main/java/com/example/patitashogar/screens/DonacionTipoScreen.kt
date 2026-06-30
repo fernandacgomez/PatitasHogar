@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun DonacionTipoScreen(
+    onVolver: () -> Unit,
     onEfectivoClick: () -> Unit,
     onInsumoClick: () -> Unit
 ) {
@@ -34,11 +36,39 @@ fun DonacionTipoScreen(
             .padding(horizontal = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(42.dp))
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier
+                    .size(52.dp)
+                    .clickable { onVolver() },
+                shape = CircleShape,
+                color = Color.White,
+                shadowElevation = 4.dp
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "←",
+                        fontSize = 30.sp,
+                        color = verde,
+                        modifier = Modifier.offset(y = (-3).dp)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
 
         Text(
             text = "¿Qué te gustaría donar?",
-            fontSize = 21.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1B1B1B),
             textAlign = TextAlign.Center
@@ -48,10 +78,10 @@ fun DonacionTipoScreen(
 
         Text(
             text = "Elige la opción que mejor se adapte\na tu forma de ayudar.",
-            fontSize = 15.sp,
+            fontSize = 16.sp,
             color = Color(0xFF555555),
             textAlign = TextAlign.Center,
-            lineHeight = 22.sp
+            lineHeight = 23.sp
         )
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -81,8 +111,8 @@ fun DonacionTipoScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(58.dp),
-            shape = RoundedCornerShape(14.dp),
+                .height(64.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
             ),
@@ -98,15 +128,15 @@ fun DonacionTipoScreen(
             ) {
                 Text(
                     text = "♥",
-                    fontSize = 26.sp,
+                    fontSize = 28.sp,
                     color = verde
                 )
 
                 Spacer(modifier = Modifier.width(18.dp))
 
                 Text(
-                    text = "Cada donación, grande o pequeña, hace\nuna gran diferencia en sus vidas. ¡Gracias!",
-                    fontSize = 13.5.sp,
+                    text = "Cada donación ayuda a mejorar la vida de nuestros peludos. ¡Gracias!",
+                    fontSize = 14.sp,
                     color = Color(0xFF555555),
                     lineHeight = 19.sp
                 )
@@ -129,7 +159,7 @@ fun OpcionDonacionCard(
             .fillMaxWidth()
             .height(116.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
@@ -189,4 +219,3 @@ fun OpcionDonacionCard(
         }
     }
 }
-

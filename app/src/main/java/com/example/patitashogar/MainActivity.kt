@@ -4,29 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import com.example.patitashogar.model.Mascota
 import com.example.patitashogar.repository.DonacionApiRepository
-import com.example.patitashogar.repository.MascotaApiRepository
-import com.example.patitashogar.repository.UsuarioApiRepository
-import com.example.patitashogar.screens.AdminDonacionesScreen
-import com.example.patitashogar.screens.AdminScreen
-import com.example.patitashogar.screens.DetalleMascotaScreen
-import com.example.patitashogar.screens.DonacionScreen
-import com.example.patitashogar.screens.DonacionTipoScreen
-import com.example.patitashogar.screens.HomeScreen
-import com.example.patitashogar.screens.InsumosScreen
-import com.example.patitashogar.screens.LoginScreen
-import com.example.patitashogar.screens.RegisterScreen
-import com.example.patitashogar.screens.ReportarScreen
+import com.example.patitashogar.screens.*
 import com.example.patitashogar.service.DonacionApi
 import com.example.patitashogar.ui.theme.PatitasHogarTheme
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -54,21 +37,14 @@ fun AppPatitasHogar() {
         mutableStateOf<List<DonacionApi>>(emptyList())
     }
 
-    val scope = rememberCoroutineScope()
-
+    // Se deja por si luego vuelven a conectar la API
     val donacionApiRepository = remember {
         DonacionApiRepository()
     }
 
-    val mascotaApiRepository = remember {
-        MascotaApiRepository()
-    }
-
-    val usuarioApiRepository = remember {
-        UsuarioApiRepository()
-    }
-
     when (pantallaActual) {
+
+        // ---------------- LOGIN ----------------
 
         "login" -> {
             LoginScreen(
@@ -85,22 +61,27 @@ fun AppPatitasHogar() {
             )
         }
 
+        // ---------------- REGISTRO ----------------
+
         "registro" -> {
             RegisterScreen(
                 onRegisterSuccess = {
                     pantallaActual = "login"
                 },
-                onRegistrarUsuario = { usuario ->
-                    scope.launch {
-                        try {
-                            usuarioApiRepository.registrarUsuario(usuario)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
+                onRegistrarUsuario = {
+
+                    println("Usuario registrado temporalmente")
+
+                    pantallaActual = "login"
+
+                },
+                onVolverLogin = {
+                    pantallaActual = "login"
                 }
             )
         }
+
+        // ---------------- HOME ----------------
 
         "home" -> {
             HomeScreen(
@@ -121,6 +102,8 @@ fun AppPatitasHogar() {
             )
         }
 
+        // ---------------- DETALLE ----------------
+
         "detalle" -> {
             DetalleMascotaScreen(
                 mascota = mascotaSeleccionada,
@@ -130,26 +113,13 @@ fun AppPatitasHogar() {
             )
         }
 
-        "reportar" -> {
-            ReportarScreen(
-                onVolver = {
-                    pantallaActual = "home"
-                },
-                onGuardarMascota = { mascota ->
-                    scope.launch {
-                        try {
-                            mascotaApiRepository.guardarMascota(mascota)
-                            pantallaActual = "home"
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-            )
-        }
+        // ---------------- DONACIONES ----------------
 
         "tipoDonacion" -> {
             DonacionTipoScreen(
+                onVolver = {
+                    pantallaActual = "home"
+                },
                 onEfectivoClick = {
                     pantallaActual = "donacion"
                 },
@@ -164,15 +134,12 @@ fun AppPatitasHogar() {
                 onVolver = {
                     pantallaActual = "home"
                 },
-                onGuardarDonacion = { donacion ->
-                    scope.launch {
-                        try {
-                            donacionApiRepository.guardarDonacion(donacion)
-                            pantallaActual = "home"
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
+                onGuardarDonacion = {
+
+                    println("Donación guardada temporalmente")
+
+                    pantallaActual = "home"
+
                 }
             )
         }
@@ -182,30 +149,45 @@ fun AppPatitasHogar() {
                 onVolver = {
                     pantallaActual = "home"
                 },
-                onGuardarDonacion = { donacion ->
-                    scope.launch {
-                        try {
-                            donacionApiRepository.guardarDonacion(donacion)
-                            pantallaActual = "home"
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
+                onGuardarDonacion = {
+
+                    println("Donación de insumos guardada temporalmente")
+
+                    pantallaActual = "home"
+
                 }
             )
         }
 
+        // ---------------- REPORTAR ----------------
+
+        "reportar" -> {
+            ReportarScreen(
+                onVolver = {
+                    pantallaActual = "home"
+                },
+                onGuardarMascota = {
+
+                    println("Mascota reportada temporalmente")
+
+                    pantallaActual = "home"
+
+                }
+            )
+        }
+
+
+
+        // ---------------- ADMIN ----------------
+
         "admin" -> {
             AdminScreen(
                 onVerDonaciones = {
-                    scope.launch {
-                        try {
-                            donacionesApi = donacionApiRepository.obtenerDonaciones()
-                            pantallaActual = "adminDonaciones"
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
+
+                    println("Mostrando donaciones temporales")
+
+                    pantallaActual = "adminDonaciones"
+
                 },
                 onCerrarSesion = {
                     pantallaActual = "login"

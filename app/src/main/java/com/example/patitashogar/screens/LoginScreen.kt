@@ -139,28 +139,19 @@ fun LoginScreen(
             onClick = {
 
                 if (correo == "admin@patitas.com" && contrasena == "1234") {
-
                     onAdminLogin()
-
                 } else {
+                    // Entrará cualquier usuario
+                    val nombre = if (correo.isBlank())
+                        "Invitado"
+                    else
+                        correo.substringBefore("@")
 
-                    val usuario = DatosPrueba.usuarios.find {
-                        it.correo == correo && it.password == contrasena
-                    }
-
-                    if (usuario != null) {
-
-                        onUserLogin(usuario.nombre)
-
-                    } else {
-
-                        error = "Usuario o contraseña incorrectos"
-
-                    }
-
+                    onUserLogin(nombre)
                 }
 
-            },
+            }
+            ,
             colors = ButtonDefaults.buttonColors(
                 containerColor = verdePrincipal
             ),
